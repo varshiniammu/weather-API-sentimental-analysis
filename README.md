@@ -91,6 +91,7 @@ Before running the project, make sure to configure the following:
   - Upload the required *JAR dependencies* to an S3 bucket, then reference their paths in the job configuration under --extra-jars. Example JARs include:
     - spark-sql-kafka-0-10_2.12.jar
     - kafka-clients.jar
+    - hadoop-aws-3.3.4.jar
     - Any other compatible Kafka and Spark JARs for your Glue version.
   - Add the JAR S3 path like this in the job’s parameters:
 
