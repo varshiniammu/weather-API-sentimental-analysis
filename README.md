@@ -46,6 +46,24 @@ The sentiment score is calculated using a custom Python-based algorithm without 
 - Negative: score < -0.1
 
 
+## 📊 Example Output
+| Weather Condition | Sentiment Score |
+| ----------------- | --------------- |
+| Sunny             | 0.78            |
+| Clear             | 0.72            |
+| Partly cloudy     | 0.35            |
+| Mist              | -0.23           |
+| Overcast          | -0.41           |
+| Rain              | -0.58           |
+| Thunderstorm      | -0.75           |
+| Snow              | 0.10            |
+| Fog               | -0.30           |
+| Drizzle           | -0.40           |
+| Hot and humid     | -0.55           |
+| Cool breeze       | 0.60            |
+
+
+
 ## 📂 Project Files
 
 - [lambda_kafka.py](lambda.py) — AWS Lambda function code that fetches weather from the Weather API and pushes data to Kafka on EC2.
@@ -53,42 +71,46 @@ The sentiment score is calculated using a custom Python-based algorithm without 
 - [snowflake.sql](snowflake.sql) — SQL script used to create tables and load data into Snowflake from S3.
 
 
-⚙️ Setup Instructions
 
-AWS S3
-folder name / → for raw weather API data.
+## ⚙️ Configuration Setup
 
-folder name/sentiments/ → for enriched sentiment output.
+Before running the project, make sure to configure the following:
 
-EC2 Python Producer
-Uses boto3 to read from S3.
+- *AWS Credentials:*
+  - AWS_ACCESS_KEY_ID — Your AWS Access Key ID
+  - AWS_SECRET_ACCESS_KEY — Your AWS Secret Access Key
+  - These credentials are needed for AWS Lambda, Glue, and S3 access.
 
-Uses kafka-python or confluent_kafka to push to Kafka.
+- *AWS Lambda Environment Variables:*
+  - NEWS_API_KEY — Your News API key to fetch news data.
+  - KAFKA_BROKER — Kafka broker address (e.g., ec2-public-ip:9092).
 
-Kafka Setup
-Hosted on EC2 or MSK.
+- *AWS Glue:*
+  - Ensure the Glue job has the correct IAM role permissions to read from Kafka and write to S3.
+  - - Configure the Glue job as a *streaming job* to continuously process incoming Kafka data.
+  - Upload the required *JAR dependencies* to an S3 bucket, then reference their paths in the job configuration under --extra-jars. Example JARs include:
+    - spark-sql-kafka-0-10_2.12.jar
+    - kafka-clients.jar
+    - Any other compatible Kafka and Spark JARs for your Glue version.
+  - Add the JAR S3 path like this in the job’s parameters:
 
-Topic: weather_data_raw
+- *Snowflake:*
+  - Configure Snowflake connection parameters (username, password, account, warehouse, database, schema).
+  - Set up a Snowflake task to load data from S3 every 5 minutes.
 
-Ensure security group allows port 9092.
+- *Power BI:*
+  - Connect Power BI to your Snowflake data warehouse.
+  - (Note: Power BI refresh is manual.)
 
-PySpark Streaming Job
-Runs on EMR or a Spark cluster.
-
-Reads from Kafka, performs NLP, writes sentiment scores to S3.
-
-Snowflake
-Snowpipe or batch ingestion from processed S3 folder.
-
-Table columns: Timestamp, City, Weather Description, Sentiment Score, etc.
-
-Power BI
-Connects directly to Snowflake.
-
-Visualizes time-series trends, sentiment by city, etc.
+- *EC2 Instance (Kafka Broker):*
+  - Kafka is hosted on an EC2 instance.
+  - Make sure:
+    - Kafka is installed and running on *port 9092*.
+    - EC2 security group allows *inbound TCP traffic on port 9092*.
+    - Kafka is configured to advertise the *public IP address*.
 
 
-  - Automation Triggers:
+ Automation Triggers:
   - Lambda Trigger: Create a CloudWatch EventBridge rule to trigger the Lambda function every **15 minutes.
   - *Snowflake Task: Set up to run every **5 minutes* to load newly arrived S3 data.
   - *Glue Streaming Job: Automatically picks up new Kafka data as it arrives.
