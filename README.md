@@ -107,7 +107,8 @@ Use Snowflake usage dashboards and Power BI alerts.
 
 
 ## Architecture Diagram
-[architecture](architecture.jpge)
+
+![Architecture](architecture.jpge)
 
 ## ✅ Conclusion
 
