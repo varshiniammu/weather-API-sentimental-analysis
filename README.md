@@ -82,7 +82,7 @@ Before running the project, make sure to configure the following:
   - These credentials are needed for AWS Lambda, Glue, and S3 access.
 
 - *AWS Lambda Environment Variables:*
-  - NEWS_API_KEY — Your News API key to fetch news data.
+  - NEWS_API_KEY — Your weather API key to fetch weather data.
   - KAFKA_BROKER — Kafka broker address (e.g., ec2-public-ip:9092).
 
 - *AWS Glue:*
